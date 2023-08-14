@@ -1,31 +1,44 @@
 // SPDX-License-Identifier: BSD-4-Clause
 pragma solidity >=0.8.20;
 
-import "../library/contracts/hardhat/console.sol";
+//import "./hardhat/console.sol";
 
-import "../library/contracts/openzeppelin/utils/Strings.sol";
+import "./FloatingPointMaths.sol";
 
-
-/// [  2   1  -1 ]   [   8 ]
-/// [ -3  -1   2 ] = [ -11 ]
-/// [ -2   1   2 ]   [  -3 ]
-// https://en.wikipedia.org/wiki/Gaussian_elimination
-
-contract MatrixInversion {
-
-    int256 MAX_NUMBER = 10**18;
+/// @title Guassian Elimination Solver
+/// @author 0x365
+/// @notice Solves the matrix problem ax=b where a and b are known matrices using guassian elimination
+/// @dev WIP - currently only square matrices
+contract GuassianSolve is FloatingPointMaths {
     
     function _invert_matrix(int256[][] memory a) 
         public 
-        view 
+        pure 
         returns (int256[] memory) 
-    {   
-        // MULTIPLY NUMBERS BY 1e18 outside or inside function
+    {  
+        // a should be input as follows with any required dimensions
+        //  | a, a, a, b |
+        //  | a, a, a, b |
+        //  | a, a, a, b |
+        //  | a, a, a, b |
+        int256[][] memory a_triangle = _upper_triangular(a);
+        int256[] memory x = _elimination(a_triangle);
+        return x;        
+    }
+
+
+    function _upper_triangular(int256[][] memory a)
+        public 
+        pure 
+        returns (int256[][] memory) 
+    {
+        // Gets dimensions of array
         uint k = a.length;
         uint k2 = a[0].length;
-        
         // Gets matrix in Echelon Form
-        //Loop through diagnol start point (not sure)
+        // z - determines the diagnol
+        // y - determines the row that the operation is being done on
+        // x - determines the column in the row of the operation
         for (uint z = 0; z < k-1; z++) {
             int256[][] memory a2 = new int256[][](k);
             int mul_1 = a[z][z];
@@ -39,6 +52,7 @@ contract MatrixInversion {
                     int mul_2 = a[y][z];
                     require(mul_2 != 0, "Input matrix is singular");
                     for (uint x = 0; x < k2; x++) {
+                        // Guassian Elimination
                         a2_temp[x] = a[y][x]*mul_1 - a[z][x]*mul_2;
                     }
                 }
@@ -46,9 +60,19 @@ contract MatrixInversion {
             }
             a = a2;
         }
+        return a;
+    }
 
-        int256[] memory out = new int256[](k);
+    // Solves for x matrix values
+    function _elimination(int256[][] memory a)
+        public
+        pure
+        returns (int256[] memory)
+    {
+        uint k = a.length;
+        uint k2 = a[0].length;
         
+        int256[] memory out = new int256[](k);
         for (uint y = k-1; y >= 0; y--) {
             int256 d = a[y][k2-1];
             for (uint x = k-1; x > y; x-- ) {
@@ -70,26 +94,5 @@ contract MatrixInversion {
         }
         return out;
     }
-
-    function divide (int256 a, int256 b) 
-        public
-        view
-        returns(int256)
-    {   
-        int256 a_scaled = a * MAX_NUMBER;
-        int256 out = (a_scaled-(a_scaled % b))/b;
-        return out/MAX_NUMBER;
-    }
-
-    function divide_big (int256 a, int256 b) 
-        public
-        view
-        returns(int256)
-    {   
-        int256 a_scaled = a * MAX_NUMBER;
-        int256 out = (a_scaled-(a_scaled % b))/b;
-        return out;
-    }
-
 
 }

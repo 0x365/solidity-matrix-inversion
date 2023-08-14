@@ -3,7 +3,9 @@ creds = require( './credentials.json');
 
 //const { config } = require("hardhat");
 const { Wallet } = require("ethers");
-const path = require("path");
+const { path } = require("path");
+const { fs } = require("fs");
+
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -16,10 +18,6 @@ module.exports = {
     auto: {
       url: creds.url,
       accounts: [creds.private_key]
-    },
-    localhost: {
-      url: "http://127.0.0.1:8545",
-      //accounts: [creds.private_key]
     }
   },
 
@@ -41,10 +39,7 @@ function jsonConcat(o1, o2) {
 
 
 task("accounts-example", "Prints the list of accounts", async (taskArgs, hre) => {
-  const fs = require("fs");
   const { config } = require("hardhat");
-  const { Wallet } = require("ethers");
-  const path = require("path");
 
   const accounts = config.networks.hardhat.accounts;
 

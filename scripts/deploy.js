@@ -14,7 +14,7 @@ async function key_to_signer(priv) {
 
 const accounts = config.networks.auto.accounts;
 
-const contract_name = "CalculateAlpha";
+const contract_name = "GuassianSolve";
 
 async function main() {
   
