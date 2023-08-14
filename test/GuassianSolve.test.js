@@ -65,7 +65,7 @@ describe("GuassianSolves Contract", function () {
                 matrix.push(temp);
             }
 
-            result = await app._invert_matrix(matrix);
+            result = await app.solve_matrix(matrix);
             var result_out = [];
             for (let i=0; i<result.length; i++) {
                 result_out[i] = parseInt(result[i]);

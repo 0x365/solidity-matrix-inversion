@@ -98,7 +98,7 @@ async function main() {
     console.log(matrix);
 
 
-    tx2 = await dapp.connect(await key_to_signer(accounts[0]))._invert_matrix(matrix, tx_params);
+    tx2 = await dapp.connect(await key_to_signer(accounts[0])).solve_matrix(matrix, tx_params);
     console.log(tx2);
 
 

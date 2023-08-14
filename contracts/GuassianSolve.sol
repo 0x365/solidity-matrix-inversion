@@ -15,7 +15,7 @@ contract GuassianSolve is FloatingPointMaths {
     /// @notice Inverts a given matrix `a` using Gaussian elimination.
     /// @param a The coefficient matrix to be inverted.
     /// @return An array containing the solution vector.
-    function _invert_matrix(int256[][] memory a) 
+    function solve_matrix(int256[][] memory a) 
         public 
         pure 
         returns (int256[] memory) 
