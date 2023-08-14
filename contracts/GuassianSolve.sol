@@ -11,6 +11,10 @@ import "./FloatingPointMaths.sol";
 /// @dev WIP - currently only square matrices
 contract GuassianSolve is FloatingPointMaths {
     
+
+    /// @notice Inverts a given matrix `a` using Gaussian elimination.
+    /// @param a The coefficient matrix to be inverted.
+    /// @return An array containing the solution vector.
     function _invert_matrix(int256[][] memory a) 
         public 
         pure 
@@ -22,11 +26,14 @@ contract GuassianSolve is FloatingPointMaths {
         //  | a, a, a, b |
         //  | a, a, a, b |
         int256[][] memory a_triangle = _upper_triangular(a);
-        int256[] memory x = _elimination(a_triangle);
+        int256[] memory x = _back_substitution(a_triangle);
         return x;        
     }
 
 
+    /// @notice Converts a given matrix `a` into upper triangular form using Gaussian elimination.
+    /// @param a The matrix to be transformed.
+    /// @return The matrix in upper triangular form.
     function _upper_triangular(int256[][] memory a)
         public 
         pure 
@@ -63,8 +70,11 @@ contract GuassianSolve is FloatingPointMaths {
         return a;
     }
 
-    // Solves for x matrix values
-    function _elimination(int256[][] memory a)
+
+    /// @notice Solves a system of equations using backward substitution after Gaussian elimination.
+    /// @param a The upper triangular matrix representing the system of equations.
+    /// @return An array containing the solution vector.
+    function _back_substitution(int256[][] memory a)
         public
         pure
         returns (int256[] memory)
