@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: BSD-4-Clause
 pragma solidity >=0.8.20;
 
-//import "./hardhat/console.sol";
+import "./hardhat/console.sol";
 
 import "./FloatingPointMaths.sol";
+
+import "./Tools.sol";
 
 /// @title Guassian Elimination Solver
 /// @author 0x365
@@ -17,7 +19,7 @@ contract GuassianSolve is FloatingPointMaths {
     /// @return An array containing the solution vector.
     function solve_matrix(int256[][] memory a) 
         public 
-        pure 
+        view 
         returns (int256[] memory) 
     {  
         // a should be input as follows with any required dimensions
@@ -36,7 +38,7 @@ contract GuassianSolve is FloatingPointMaths {
     /// @return The matrix in upper triangular form.
     function _upper_triangular(int256[][] memory a)
         public 
-        pure 
+        view 
         returns (int256[][] memory) 
     {
         // Gets dimensions of array
@@ -76,31 +78,27 @@ contract GuassianSolve is FloatingPointMaths {
     /// @return An array containing the solution vector.
     function _back_substitution(int256[][] memory a)
         public
-        pure
+        view
         returns (int256[] memory)
     {
         uint k = a.length;
         uint k2 = a[0].length;
-        
+        // Scales all values to PRECISION
+        a = scale_array(a);
         int256[] memory out = new int256[](k);
+        int256 d;
         for (uint y = k-1; y >= 0; y--) {
-            int256 d = a[y][k2-1];
+            d = scale(a[y][k2-1], PRECISION);
+            // Sum up subtraction of already found values
             for (uint x = k-1; x > y; x-- ) {
-                d = d - a[y][x]*out[x];
+                d = d - (a[y][x]*out[x]);
             }
+            // Divide by coefficient of the value to find for that specific row
             out[y] = divide(d, a[y][y]);
+            // End as need to include zero but uint loop cant hit -1
             if (y == 0) {
                 break;
             }
-        }
-        int256 sum = 0;
-        for (uint y = 0; y < k; y++) {
-            sum += out[y];
-        }
-        //int256[] memory out2 = new int256[](k);
-        for (uint y = 0; y < k; y++) {
-            out[y] = divide_big(out[y], sum);
-            //console.logInt(out2[y]);
         }
         return out;
     }
